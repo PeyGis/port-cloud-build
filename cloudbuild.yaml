@@ -13,11 +13,52 @@ steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['run', 'deploy', '${_REPOSITORY}', '--image', '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}', '--region', '${_REGION}', '--platform', 'managed', "--allow-unauthenticated"]
 
+
+# Get Port's Access Token
+  - name: 'gcr.io/cloud-builders/curl'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Get access token and save it to a file
+        accessToken=$(curl -X POST \
+          -H 'Content-Type: application/json' \
+          -d '{"clientId": "${_PORT_CLIENT_ID}", "clientSecret": "${_PORT_CLIENT_SECRET}"}' \
+          -s 'https://api.getport.io/v1/auth/access_token' | grep -o '"accessToken":"[^"]*' | awk -F'"' '{print $4}')
+        echo "$accessToken" > /workspace/token.txt
+​
+# Logs sending example
+  - name: gcr.io/cloud-builders/curl
+    args:
+      - '-c'
+      - |
+        curl -X POST \
+         -H 'Content-Type: application/json' \
+         -H "Authorization: Bearer $(cat /workspace/token.txt)" \
+         -d '{"message": "this is a log test message example"}' \
+         'https://api.getport.io/v1/actions/runs/${_RUN_ID}/logs'
+    entrypoint: bash
+​
+# Port status update example
+  - name: gcr.io/cloud-builders/curl
+    args:
+      - '-c'
+      - |
+        curl -X PATCH \
+         -H 'Content-Type: application/json' \
+         -H "Authorization: Bearer $(cat /workspace/token.txt)" \
+         -d '{"status":"SUCCESS", "message": {"run_status": "CloudBuild Run completed successfully!"}}' \
+          'https://api.getport.io/v1/actions/runs/${_RUN_ID}'
+    entrypoint: bash
+
 substitutions:
     #Repository Specific configuration. DevOps can change this settings
     _REPOSITORY: your_container_name
     _IMAGE_NAME: $(body.payload.properties.image_name)
     _REGION: $(body.payload.properties.region)
+    _RUN_ID: $(body.context.runId)
+    _PORT_CLIENT_ID: kNYO6zJG7mEddoPtkFwmriTn8FhhIvgs
+    _PORT_CLIENT_SECRET: rOAseMwf65s1RmJJE8NDJp13cuGxUSHl5zs4YzKJ7sOWZLyaKEis00aQbb7KDBHa
     
 options:
     substitution_option: 'ALLOW_LOOSE'
