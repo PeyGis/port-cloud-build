@@ -56,9 +56,9 @@ substitutions:
     _IMAGE_NAME: $(body.payload.properties.image_name)
     _REGION: $(body.payload.properties.region)
     _RUN_ID: $(body.context.runId)
-    _PORT_CLIENT_ID: kNYO6zJG7mEddoPtkFwmriTn8FhhIvgs
-    _PORT_CLIENT_SECRET: rOAseMwf65s1RmJJE8NDJp13cuGxUSHl5zs4YzKJ7sOWZLyaKEis00aQbb7KDBHa
+    _PORT_CLIENT_ID: HERE
+    _PORT_CLIENT_SECRET: HERE
     
 options:
-    substitution_option: 'ALLOW_LOOSE'
+    substitution_option: ALLOW_LOOSE
     logging: CLOUD_LOGGING_ONLY
