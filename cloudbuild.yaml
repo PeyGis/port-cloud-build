@@ -25,7 +25,7 @@ steps:
         -d '{"clientId": "${_PORT_CLIENT_ID}", "clientSecret": "${_PORT_CLIENT_SECRET}"}' \
         -s 'https://api.getport.io/v1/auth/access_token' | grep -o '"accessToken":"[^"]*' | awk -F'"' '{print $4}')
       echo "$accessToken" > /workspace/token.txt
-​
+
 # Logs sending example
 - name: gcr.io/cloud-builders/curl
   args:
@@ -37,7 +37,7 @@ steps:
         -d '{"message": "this is a log test message example"}' \
         'https://api.getport.io/v1/actions/runs/${_RUN_ID}/logs'
   entrypoint: bash
-​
+
 # Port status update example
 - name: gcr.io/cloud-builders/curl
   args:
@@ -52,7 +52,7 @@ steps:
 
 substitutions:
     #Repository Specific configuration. DevOps can change this settings
-    _REPOSITORY: your_container_name
+    _REPOSITORY: port-demo
     _IMAGE_NAME: $(body.payload.properties.image_name)
     _REGION: $(body.payload.properties.region)
     _RUN_ID: $(body.context.runId)
